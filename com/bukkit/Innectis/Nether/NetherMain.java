@@ -5,7 +5,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.Server;
-
+import org.bukkit.event.Event;
+import org.bukkit.event.Event.Priority;
 import org.bukkit.plugin.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,6 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class NetherMain extends JavaPlugin
 {
 	private final static Logger logger = Logger.getLogger("Minecraft");
+	private final NetherPlayerListener playerListener = new NetherPlayerListener(this);
 
 	public NetherMain(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader)
 	{
@@ -29,8 +31,8 @@ public class NetherMain extends JavaPlugin
 	public void onEnable()
 	{
 		// Register events
-		//PluginManager pm = getServer().getPluginManager();
-		//pm.registerEvent(Event.Type.BLOCK_RIGHTCLICKED, blockListener, Priority.High, this);
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
 
 		// Say hi
 		PluginDescriptionFile pdfFile = this.getDescription();
