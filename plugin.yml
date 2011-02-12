@@ -1,0 +1,3 @@
+name: Nether
+main: com.bukkit.Innectis.Nether.NetherMain
+version: 0.9
