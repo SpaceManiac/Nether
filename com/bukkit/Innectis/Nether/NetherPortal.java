@@ -25,8 +25,16 @@ public class NetherPortal {
 	
 	// Return a random spawnable location
 	public Location getSpawn() {
-		return new Location(block.getWorld(), block.getX() + 0.5 + Math.random(),
-				block.getY(), block.getZ() + 0.5 + 1 - (int)(2*Math.random()));
+		if (block.getWorld().getBlockAt(block.getX() + 1, block.getY(), block.getZ()).getType().equals(Material.PORTAL) ||
+				block.getWorld().getBlockAt(block.getX() - 1, block.getY(), block.getZ()).getType().equals(Material.PORTAL)) {
+			// portal is in X direction
+			return new Location(block.getWorld(), block.getX() + 0.5,
+					block.getY(), block.getZ() + 1.5 - 2 * Math.round(Math.random()));
+		} else {
+			// portal is in Z direction
+			return new Location(block.getWorld(), block.getX() + 1.5 - 2 * Math.round(Math.random()),
+					block.getY(), block.getZ() + 0.5);
+		}
 	}
 	
 	// ==============================
