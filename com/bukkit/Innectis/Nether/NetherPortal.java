@@ -25,11 +25,8 @@ public class NetherPortal {
 	
 	// Return a random spawnable location
 	public Location getSpawn() {
-		double radius = 3 + 2 * Math.random();
-		double angle = 2 * Math.PI * Math.random();
-		double dx = radius * Math.cos(angle);
-		double dz = radius * Math.sin(angle);
-		return new Location(block.getWorld(), block.getX() + 0.5 + dx, block.getY(), block.getZ() + 0.5 + dz);
+		return new Location(block.getWorld(), block.getX() + 0.5 + Math.random(),
+				block.getY(), block.getZ() + 0.5 + 1 - (int)(2*Math.random()));
 	}
 	
 	// ==============================
@@ -94,10 +91,10 @@ public class NetherPortal {
 		
 		// Clear area around portal
 		ArrayList<Block> columns = new ArrayList<Block>();
-		for (int x2 = x - 6; x2 <= x + 6; ++x2) {
-			for (int z2 = z - 6; z2 <= z + 6; ++z2) {
+		for (int x2 = x - 4; x2 <= x + 4; ++x2) {
+			for (int z2 = z - 4; z2 <= z + 4; ++z2) {
 				int dx = x - x2, dz = z - z2;
-				if (dx * dx + dz * dz <= 36) {
+				if (dx * dx + dz * dz < 12) {
 					columns.add(world.getBlockAt(x2, 0, z2));
 				}
 			}
@@ -112,17 +109,17 @@ public class NetherPortal {
 			}
 		}
 		
-		// Portal itself
+		// Build obsidian frame
 		for (int xd = -1; xd < 3; ++xd) {
 			for (int yd = -1; yd < 4; ++yd) {
-				Material place = Material.PORTAL;
-				
-				// set borders to obsidian
-				if (xd == -1 || yd == -1 || xd == 2 || yd == 3) place = Material.OBSIDIAN;
-				
-				world.getBlockAt(x + xd, y + yd, z).setType(place);
+				if (xd == -1 || yd == -1 || xd == 2 || yd == 3) {
+					world.getBlockAt(x + xd, y + yd, z).setType(Material.OBSIDIAN);
+				}
 			}
 		}
+		
+		// Set it alight!
+		dest.setType(Material.FIRE);
 		
 		return new NetherPortal(dest);
 	}
