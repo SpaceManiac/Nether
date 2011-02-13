@@ -44,8 +44,14 @@ public class NetherPlayerListener extends PlayerListener
 			}
 			
 			// Try to find a portal near where the player should land
-			// TODO
+			Block dest = nether.getBlockAt(b.getX() / 8, b.getY(), b.getZ() / 8);
+			NetherPortal portal = NetherPortal.findPortal(dest);
+			if (portal == null) {
+				portal = NetherPortal.createPortal(dest);
+			}
 			
+			// Go!
+			event.setTo(portal.getSpawn());
 		} else if (world.getEnvironment().equals(Environment.NETHER)) {
 			// For now just head to the first world there.
 			World normal = main.getServer().getWorlds().get(0);
@@ -56,7 +62,14 @@ public class NetherPlayerListener extends PlayerListener
 			}
 			
 			// Try to find a portal near where the player should land
-			// TODO
+			Block dest = normal.getBlockAt(b.getX() * 8, b.getY(), b.getZ() * 8);
+			NetherPortal portal = NetherPortal.findPortal(dest);
+			if (portal == null) {
+				portal = NetherPortal.createPortal(dest);
+			}
+			
+			// Go!
+			event.setTo(portal.getSpawn());
 		}
 	}
 	

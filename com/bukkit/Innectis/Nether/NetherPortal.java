@@ -25,7 +25,11 @@ public class NetherPortal {
 	
 	// Return a random spawnable location
 	public Location getSpawn() {
-		return null;
+		double radius = 3 + 2 * Math.random();
+		double angle = 2 * Math.PI * Math.random();
+		double dx = radius * Math.cos(angle);
+		double dz = radius * Math.sin(angle);
+		return new Location(block.getWorld(), block.getX() + 0.5 + dx, block.getY(), block.getZ() + 0.5 + dz);
 	}
 	
 	// ==============================
