@@ -33,6 +33,7 @@ public class NetherMain extends JavaPlugin
 		// Register events
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Priority.High, this);
 
 		// Say hi
 		PluginDescriptionFile pdfFile = this.getDescription();
