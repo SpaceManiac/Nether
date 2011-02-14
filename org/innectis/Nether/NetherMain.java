@@ -42,8 +42,6 @@ public class NetherMain extends JavaPlugin
 
 	public void onDisable()
 	{
-		PluginDescriptionFile pdfFile = this.getDescription();
-		log(pdfFile.getName() + " v" + pdfFile.getVersion() + " disabled");
 	}
 
 	public void log(String text)
