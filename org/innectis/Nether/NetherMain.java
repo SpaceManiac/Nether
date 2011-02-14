@@ -1,4 +1,4 @@
-package com.bukkit.Innectis.Nether;
+package org.innectis.Nether;
 
 import java.io.File;
 import java.util.logging.Level;

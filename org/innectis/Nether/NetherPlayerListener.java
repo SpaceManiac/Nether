@@ -1,4 +1,4 @@
-package com.bukkit.Innectis.Nether;
+package org.innectis.Nether;
 
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
