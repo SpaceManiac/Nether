@@ -2,7 +2,6 @@ package org.innectis.Nether;
 
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.Location;
@@ -17,12 +16,6 @@ public class NetherPlayerListener extends PlayerListener
 	public NetherPlayerListener(NetherMain plugin)
 	{
 		main = plugin;
-	}
-	
-	@Override
-	public void onPlayerRespawn(PlayerRespawnEvent event)
-	{
-		main.log(event.getPlayer().getName() + " respawning");
 	}
 	
 	@Override
