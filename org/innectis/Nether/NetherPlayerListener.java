@@ -17,7 +17,6 @@ public class NetherPlayerListener extends PlayerListener
 	public NetherPlayerListener(NetherMain plugin)
 	{
 		main = plugin;
-		plugin = main;
 	}
 	
 	@Override
