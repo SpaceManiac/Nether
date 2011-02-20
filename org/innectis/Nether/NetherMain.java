@@ -23,11 +23,6 @@ public class NetherMain extends JavaPlugin
 	private final static Logger logger = Logger.getLogger("Minecraft");
 	private final NetherPlayerListener playerListener = new NetherPlayerListener(this);
 
-	public NetherMain(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader)
-	{
-		super(pluginLoader, instance, desc, folder, plugin, cLoader);
-	}
-
 	public void onEnable()
 	{
 		// Register events
@@ -47,10 +42,5 @@ public class NetherMain extends JavaPlugin
 	public void log(String text)
 	{
 		logger.log(Level.INFO, text);
-	}
-
-	public void logWarning(String text)
-	{
-		logger.log(Level.WARNING, text);
 	}
 }
