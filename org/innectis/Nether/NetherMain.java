@@ -1,10 +1,8 @@
 package org.innectis.Nether;
 
-import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bukkit.Server;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.plugin.*;
