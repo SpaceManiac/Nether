@@ -4,6 +4,14 @@ Nether is a quick Bukkit plugin that makes portals function very similar to
 single player. It uses no permissions, adds no commands, and has no other
 features.
 
+  - Walking through portals will search for a portal in the proper location
+    in the other world, creating one if none is found.
+  - Automatically created portals have a stone platform and an air pocket
+    formed around them.
+  - Dying in the Nether will respawn players in the normal world.
+
+Nether is currently on version 1.1.
+
 == LICENSE ==
 
 Copyright (C) 2011 by Tad Hardesty
@@ -25,3 +33,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
