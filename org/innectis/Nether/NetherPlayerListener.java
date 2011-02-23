@@ -19,6 +19,25 @@ public class NetherPlayerListener extends PlayerListener
 	}
 	
 	@Override
+	public void onPlayerRespawn(PlayerRespawnEvent event)
+	{
+		// Return nether-deaths to normal world
+		if (event.getRespawnLocation().getWorld().getEnvironment().equals(Environment.NETHER)) {
+			// For now just head to the first world there.
+			World normal = main.getServer().getWorlds().get(0);
+			if (!normal.getEnvironment().equals(Environment.NORMAL)) {
+				// Don't teleport to a non-normal world
+				return;
+			}
+			
+			Location respawnLocation = normal.getSpawnLocation();
+			main.log(event.getPlayer().getName() + " respawns to normal world");
+			event.setRespawnLocation(respawnLocation);
+		}
+	}
+
+	
+	@Override
 	public void onPlayerMove(PlayerMoveEvent event)
 	{
 		Location loc = event.getTo();
