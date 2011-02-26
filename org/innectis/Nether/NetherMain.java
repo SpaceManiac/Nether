@@ -1,8 +1,5 @@
 package org.innectis.Nether;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.plugin.*;
@@ -18,7 +15,6 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class NetherMain extends JavaPlugin
 {
-	private final static Logger logger = Logger.getLogger("Minecraft");
 	private final NetherPlayerListener playerListener = new NetherPlayerListener(this);
 
 	public void onEnable()
@@ -30,15 +26,10 @@ public class NetherMain extends JavaPlugin
 
 		// Say hi
 		PluginDescriptionFile pdfFile = this.getDescription();
-		log(pdfFile.getName() + " v" + pdfFile.getVersion() + " enabled");
+		System.out.println(pdfFile.getName() + " v" + pdfFile.getVersion() + " enabled");
 	}
 
 	public void onDisable()
 	{
-	}
-
-	public void log(String text)
-	{
-		logger.log(Level.INFO, text);
 	}
 }

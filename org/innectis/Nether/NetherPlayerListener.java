@@ -32,7 +32,7 @@ public class NetherPlayerListener extends PlayerListener
 			}
 			
 			Location respawnLocation = normal.getSpawnLocation();
-			main.log(event.getPlayer().getName() + " respawns to normal world");
+			System.out.println(event.getPlayer().getName() + " respawns to normal world");
 			event.setRespawnLocation(respawnLocation);
 		}
 	}
@@ -68,9 +68,9 @@ public class NetherPlayerListener extends PlayerListener
 			NetherPortal portal = NetherPortal.findPortal(dest);
 			if (portal == null) {
 				portal = NetherPortal.createPortal(dest);
-				main.log(event.getPlayer().getName() + " portals to Nether [NEW]");
+				System.out.println(event.getPlayer().getName() + " portals to Nether [NEW]");
 			} else {
-				main.log(event.getPlayer().getName() + " portals to Nether");
+				System.out.println(event.getPlayer().getName() + " portals to Nether");
 			}
 			
 			// Go!
@@ -91,9 +91,9 @@ public class NetherPlayerListener extends PlayerListener
 			NetherPortal portal = NetherPortal.findPortal(dest);
 			if (portal == null) {
 				portal = NetherPortal.createPortal(dest);
-				main.log(event.getPlayer().getName() + " portals to normal world [NEW]");
+				System.out.println(event.getPlayer().getName() + " portals to normal world [NEW]");
 			} else {
-				main.log(event.getPlayer().getName() + " portals to normal world");
+				System.out.println(event.getPlayer().getName() + " portals to normal world");
 			}
 			
 			// Go!
