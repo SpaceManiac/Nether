@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import java.util.ArrayList;
 
 public class NetherPortal {
+	private final static boolean DEBUG = false;
 	
 	private Block block;
 	
@@ -36,44 +37,153 @@ public class NetherPortal {
 					block.getY(), block.getZ() + 0.5);
 		}
 	}
+
+	// Output a debug representation of the search for a portal block
+	public static void logSearch(char[][] a, int searchDistance) {
+		if (DEBUG) {
+			for (int y = searchDistance - 1; y >= 0; --y) {
+				String line = "";
+				for (int x = 0; x < searchDistance; ++x) {
+					if (a[x][y] != ' ')
+						line += a[x][y];
+					else
+						line += '.';
+				}
+				System.out.println(line);
+			}
+		}
+	}
 	
 	// ==============================
-	// Find a nearby portal within 16 blocks of the given block
-	// Not guaranteed to be the nearest
-	public static NetherPortal findPortal(Block dest)
-	{
-		World world = dest.getWorld();
-		
-		// Get list of columns in a circle around the block
-		ArrayList<Block> columns = new ArrayList<Block>();
-		for (int x = dest.getX() - 16; x <= dest.getX() + 16; ++x) {
-			for (int z = dest.getZ() - 16; z <= dest.getZ() + 16; ++z) {
-				int dx = dest.getX() - x, dz = dest.getZ() - z;
-				if (dx * dx + dz * dz <= 256) {
-					columns.add(world.getBlockAt(x, 0, z));
-				}
-			}
-		}
-		
-		// For each column try to find a portal block
-		for (Block col : columns) {
-			for (int y = 127; y >= 0; --y) {
-				Block b = world.getBlockAt(col.getX(), y, col.getZ());
+	// Check a column for portal blocks, starting with the players location
+	public static NetherPortal checkCol(World world, int x, int y, int z) {
+		// Portals are 3 blocks tall, so we only need to check every few blocks.
+		// Start at the user's height and go outward.
+		int d = z - 1;
+		int u = z + 1;
+		Block b = null;
+
+		while (d >= 0 || u <= 127) {
+			if (d >= 0)	{
+				b = world.getBlockAt(x, d, y);
 				if (b.getType().equals(Material.PORTAL)) {
-					// Huzzah!
 					return new NetherPortal(b);
 				}
+				d -= 3;
+			}
+			if (u <= 127) {
+				b = world.getBlockAt(x, u, y);
+				if (b.getType().equals(Material.PORTAL)) {
+					return new NetherPortal(b);
+				}
+				u += 3;
 			}
 		}
+
+		return null;
+	}
+
+	// ==============================
+	// Check for nearby portal within specified search distance
+	// Should return nearest first.
+	public static NetherPortal findPortal(Block dest, int searchDistance) {
+		World world = dest.getWorld();
 		
-		// Nope!
+		int startX = dest.getX();
+		int startY = dest.getZ();
+		int startZ = dest.getY();
+
+		// Check middle block first
+		NetherPortal np = checkCol(world, startX + (searchDistance / 2), startY + (searchDistance / 2), startZ);
+
+		// Going IN to the nether, the search distance should be 1, and if
+		// there's already a portal,
+		// it will occupy this block.
+		if (searchDistance < 2 || null != np)
+			return np;
+
+		// Start in the middle and loop outward.
+		//
+		//
+		// [8][6][6][6][6][6][6][6]
+		// [8][6][4][4][4][4][4][7]
+		// [8][6][4][2][2][2][5][7]
+		// [8][6][4][2][0][3][5][7]
+		// [8][6][4][1][1][3][5][7]
+		// [8][6][3][3][3][3][5][7]
+		// [8][5][5][5][5][5][5][7]
+		// [7][7][7][7][7][7][7][7]
+
+		int x = (searchDistance / 2), y = (searchDistance / 2);
+
+		char[][] c;
+		if (DEBUG) {
+			c = new char[searchDistance][searchDistance];
+			c[x][y] = 'S';
+		}
+
+		int sign = -1;
+		for (int n = 1; n <= searchDistance; ++n) {
+			// go in [sign] direction along the y axis [n] times
+			// go in [sign] direction along the x axis [n] times
+			// reverse [sign] and increment [n]
+			for (int xy = 0; xy < 2; ++xy) {
+				for (int i = 1; i <= n; ++i) {
+					if (0 == xy)
+						y += sign;
+					else
+						x += sign;
+
+					np = checkCol(world, x + startX, y + startY, startZ);
+					if (null != np) {
+						if (DEBUG) {
+							c[x][y] = 'X';
+							logSearch(c, searchDistance);
+						}
+						return np;
+					}
+
+					if (DEBUG) {
+						if (0 == xy) {
+							if (sign < 0)
+								c[x][y] = 'v';
+							else
+								c[x][y] = '^';
+						} else {
+							if (sign < 0)
+								c[x][y] = '<';
+							else
+								c[x][y] = '>';
+						}
+					}
+		
+					// Because we start going down, left, up, right, we'll
+					// always end traveling along the y axis
+					// on the first iteration where n == searchDistance and
+					// we'll only need to travel n-1 blocks
+					if (0 == xy && n == searchDistance && i + 1 == n) {
+						if (DEBUG)
+							logSearch(c, searchDistance);
+
+						// Didn't find a portal
+						return null;
+					}
+				}
+			}
+
+			sign *= -1;
+		}
+		
+		if (DEBUG)
+			logSearch(c, searchDistance);
+
+		// Didn't find a portal
 		return null;
 	}
 	
 	// Create a new portal at the specified block, fudging position if needed
 	// Will occasionally end up making portals in bad places, but let's hope not
-	public static NetherPortal createPortal(Block dest)
-	{
+	public static NetherPortal createPortal(Block dest, boolean orientX) {
 		World world = dest.getWorld();
 		
 		// Try not to spawn within water or lava
@@ -93,14 +203,12 @@ public class NetherPortal {
 		}
 		
 		// Create the physical portal
-		// For now, don't worry about direction
-		
 		int x = dest.getX(), y = dest.getY(), z = dest.getZ();
 		
 		// Clear area around portal
 		ArrayList<Block> columns = new ArrayList<Block>();
-		for (int x2 = x - 4; x2 <= x + 4; ++x2) {
-			for (int z2 = z - 4; z2 <= z + 4; ++z2) {
+		for (int x2 = x - 4; x2 <= x + 5; ++x2) {
+			for (int z2 = z - 4; z2 <= z + 5; ++z2) {
 				int dx = x - x2, dz = z - z2;
 				if (dx * dx + dz * dz < 12) {
 					columns.add(world.getBlockAt(x2, 0, z2));
@@ -121,7 +229,13 @@ public class NetherPortal {
 		for (int xd = -1; xd < 3; ++xd) {
 			for (int yd = -1; yd < 4; ++yd) {
 				if (xd == -1 || yd == -1 || xd == 2 || yd == 3) {
-					world.getBlockAt(x + xd, y + yd, z).setType(Material.OBSIDIAN);
+					Block b = null;
+					if (orientX)
+						b = world.getBlockAt(x + xd, y + yd, z);
+					else
+						b = world.getBlockAt(x, y + yd, z + xd);
+
+					b.setType(Material.OBSIDIAN);
 				}
 			}
 		}
@@ -130,6 +244,5 @@ public class NetherPortal {
 		dest.setType(Material.FIRE);
 		
 		return new NetherPortal(dest);
-	}
-	
+	}	
 }
