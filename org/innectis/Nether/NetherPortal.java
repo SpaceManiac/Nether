@@ -104,17 +104,22 @@ public class NetherPortal {
 		if (searchDistance < 2 || null != np)
 			return np;
 
+		// Since a portal is 2 blocks wide, we only need to
+		// check every other column.  We'll flip this flag
+		// after each check.
+		boolean checkColumn = false;
+		
 		// Start in the middle and loop outward.
 		//
-		//
-		// [8][6][6][6][6][6][6][6]
-		// [8][6][4][4][4][4][4][7]
-		// [8][6][4][2][2][2][5][7]
-		// [8][6][4][2][0][3][5][7]
-		// [8][6][4][1][1][3][5][7]
-		// [8][6][3][3][3][3][5][7]
-		// [8][5][5][5][5][5][5][7]
-		// [7][7][7][7][7][7][7][7]
+		//  8
+		// [^][6][>][>][>][>][>][6]
+		// [^][^][4][>][>][>][4][v]
+		// [^][^][^][2][>][2][v][v]
+		// [^][^][^][^][0][v][v][v]
+		// [^][^][^][1][1][v][v][v]
+		// [^][^][3][<][<][3][v][v]
+		// [^][5][<][<][<][<][5][v]
+		// [7][<][<][<][<][<][<][7]
 
 		char[][] c;
 		if (DEBUG) {
@@ -136,7 +141,10 @@ public class NetherPortal {
 					else
 						x += sign;
 
-					np = checkCol(world, x + startX, y + startY, startZ);
+					if (checkColumn)
+						np = checkCol(world, x + startX, y + startY, startZ);
+					
+					
 					if (null != np) {
 						if (DEBUG) {
 							c[x][y] = 'X';
@@ -146,18 +154,27 @@ public class NetherPortal {
 					}
 
 					if (DEBUG) {
-						if (0 == xy) {
-							if (sign < 0)
-								c[x][y] = 'v';
-							else
-								c[x][y] = '^';
-						} else {
-							if (sign < 0)
-								c[x][y] = '<';
-							else
-								c[x][y] = '>';
+						if (checkColumn) {							
+							if (0 == xy) {
+								if (sign < 0)
+									c[x][y] = 'v';
+								else
+									c[x][y] = '^';
+							} else {
+								if (sign < 0)
+									c[x][y] = '<';
+								else
+									c[x][y] = '>';
+							}
 						}
+						else
+							c[x][y] = ' ';
 					}
+					
+					// I flip my bits back and forth, I flip my bits back and forth, I flip
+					// my bits back and forth, I flip my bits back and forth, I flip my bits
+					// back and forth
+					checkColumn = !checkColumn;
 		
 					// Because we start going down, left, up, right, we'll
 					// always end traveling along the y axis
