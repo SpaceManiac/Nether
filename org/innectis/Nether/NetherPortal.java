@@ -89,12 +89,14 @@ public class NetherPortal {
 	public static NetherPortal findPortal(Block dest, int searchDistance) {
 		World world = dest.getWorld();
 		
-		int startX = dest.getX();
-		int startY = dest.getZ();
+		int startX = dest.getX();		
+		int startY = dest.getZ();		
 		int startZ = dest.getY();
 
+		int x = (searchDistance / 2), y = (searchDistance / 2);
+		
 		// Check middle block first
-		NetherPortal np = checkCol(world, startX + (searchDistance / 2), startY + (searchDistance / 2), startZ);
+		NetherPortal np = checkCol(world, startX + x, startY + y, startZ);
 
 		// Going IN to the nether, the search distance should be 1, and if
 		// there's already a portal,
@@ -114,12 +116,12 @@ public class NetherPortal {
 		// [8][5][5][5][5][5][5][7]
 		// [7][7][7][7][7][7][7][7]
 
-		int x = (searchDistance / 2), y = (searchDistance / 2);
-
 		char[][] c;
 		if (DEBUG) {
 			c = new char[searchDistance][searchDistance];
 			c[x][y] = 'S';
+			
+			System.out.println("Starting portal search at (" + (x + startX) + ", " + (y + startY) + ").");
 		}
 
 		int sign = -1;

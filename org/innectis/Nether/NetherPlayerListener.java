@@ -11,6 +11,8 @@ import org.bukkit.World.Environment;
 
 public class NetherPlayerListener extends PlayerListener {
 	private static final int NETHER_COMPRESSION = 8;
+	private final static boolean DEBUG = false;
+	
 	private NetherMain main;
 	
 	public NetherPlayerListener(NetherMain plugin) {
@@ -49,6 +51,9 @@ public class NetherPlayerListener extends PlayerListener {
 			return;
 		}
 		
+		if (DEBUG)
+			System.out.println("You hit portal at " + locX + ", "+ locY);
+		
 		// For better mapping between nether and normal, always use the lowest
 		// xyz portal block
 		while (world.getBlockAt(locX, locZ - 1, locY).getType().equals(Material.PORTAL))
@@ -57,9 +62,19 @@ public class NetherPlayerListener extends PlayerListener {
 			--locX;
 		while (world.getBlockAt(locX, locZ, locY - 1).getType().equals(Material.PORTAL))
 			--locY;
-
+		
+		if (DEBUG)
+			System.out.println("Portal block:" + locX + ", " + locY + ", " + locZ);
+		
 		// Now check to see which way the portal is oriented.
 		boolean orientX = world.getBlockAt(locX + 1, locZ, locY).getType().equals(Material.PORTAL);
+		
+		if (DEBUG) {
+			if (orientX)
+				System.out.println("X oriented.");
+			else
+				System.out.println("Y oriented.");
+		}
 
 		if (world.getEnvironment().equals(Environment.NORMAL)) {
 			// First of all see if there IS a nether yet
@@ -74,8 +89,15 @@ public class NetherPlayerListener extends PlayerListener {
 				return;
 			}
 			
+			int signAdjX = 0;
+			if (locX < 0)
+				signAdjX = 1;
+			int signAdjY = 0;
+			if (locY < 0)
+				signAdjY = 1;
+			
 			// Try to find a portal near where the player should land
-			Block dest = nether.getBlockAt(locX / NETHER_COMPRESSION, locZ, locY / NETHER_COMPRESSION);
+			Block dest = nether.getBlockAt(((locX+signAdjX) / NETHER_COMPRESSION)-signAdjX, locZ, ((locY + signAdjY) / NETHER_COMPRESSION)-signAdjY);
 			NetherPortal portal = NetherPortal.findPortal(dest, 1);
 			if (portal == null) {
 				portal = NetherPortal.createPortal(dest, orientX);
