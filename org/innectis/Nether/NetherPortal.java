@@ -107,7 +107,9 @@ public class NetherPortal {
 		// Since a portal is 2 blocks wide, we only need to
 		// check every other column.  We'll flip this flag
 		// after each check.
-		boolean checkColumn = false;
+		// TODO: can't skip checks on the outer edge of the 8x8 block
+		// boolean checkColumn = false;
+		boolean checkColumn = true;
 		
 		// Start in the middle and loop outward.
 		//
@@ -174,7 +176,8 @@ public class NetherPortal {
 					// I flip my bits back and forth, I flip my bits back and forth, I flip
 					// my bits back and forth, I flip my bits back and forth, I flip my bits
 					// back and forth
-					checkColumn = !checkColumn;
+					// TODO: can't skip checks on the outer edge of the 8x8 block
+					// checkColumn = !checkColumn;
 		
 					// Because we start going down, left, up, right, we'll
 					// always end traveling along the y axis
