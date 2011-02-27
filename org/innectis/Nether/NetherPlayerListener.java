@@ -118,9 +118,7 @@ public class NetherPlayerListener extends PlayerListener {
 				// Don't teleport to a non-normal world
 				return;
 			}
-			
-			
-			//CHANGE YO
+
 			// Try to find a portal near where the player should land
 			Block dest = normal.getBlockAt(locX * NETHER_COMPRESSION, locZ, locY * NETHER_COMPRESSION);
 			NetherPortal portal = NetherPortal.findPortal(dest, NETHER_COMPRESSION);
