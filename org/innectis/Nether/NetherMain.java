@@ -4,6 +4,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.plugin.*;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.config.Configuration;
 
 /**
  * Innectis Nether plugin class
@@ -19,6 +20,16 @@ public class NetherMain extends JavaPlugin
 
 	public void onEnable()
 	{
+		Configuration	properties = this.getConfiguration();
+		String			tempString;
+		
+		// Check the config.yml
+		tempString = properties.getString("nether-world-name");
+		if((tempString == null) || tempString.isEmpty()){
+			properties.setProperty("nether-world-name", "netherworld");
+			properties.save();
+		}
+		
 		// Register events
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);

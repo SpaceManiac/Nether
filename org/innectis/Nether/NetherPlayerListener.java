@@ -51,10 +51,14 @@ public class NetherPlayerListener extends PlayerListener
 		
 		if (world.getEnvironment().equals(Environment.NORMAL)) {
 			// First of all see if there IS a nether yet
+			
+			String netherName = main.getConfiguration().getString("nether-world-name");
 			// Here we use "netherworld"
-			World nether = main.getServer().getWorld("netherworld");
+			if((netherName == null) || netherName.isEmpty()) netherName = "netherworld";
+			
+			World nether = main.getServer().getWorld(netherName);
 			if (nether == null) {
-				nether = main.getServer().createWorld("netherworld", Environment.NETHER);
+				nether = main.getServer().createWorld(netherName, Environment.NETHER);
 			}
 			
 			if (!nether.getEnvironment().equals(Environment.NETHER)) {
