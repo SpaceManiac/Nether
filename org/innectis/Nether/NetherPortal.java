@@ -8,7 +8,7 @@ import org.bukkit.Material;
 import java.util.ArrayList;
 
 public class NetherPortal {
-	private final static boolean DEBUG = false;
+	private static final boolean DEBUG = true;
 	
 	private Block block;
 	
@@ -39,7 +39,7 @@ public class NetherPortal {
 	}
 
 	// Output a debug representation of the search for a portal block
-	public static void logSearch(char[][] a, int searchDistance) {
+	public static void logSearch(char[][] a, int searchDistance, String playerName) {
 		if (DEBUG) {
 			for (int y = searchDistance - 1; y >= 0; --y) {
 				String line = "";
@@ -49,7 +49,7 @@ public class NetherPortal {
 					else
 						line += '.';
 				}
-				System.out.println(line);
+				System.out.println("NETHER_PLUGIN: " + playerName + ": " + line);
 			}
 		}
 	}
@@ -86,7 +86,7 @@ public class NetherPortal {
 	// ==============================
 	// Check for nearby portal within specified search distance
 	// Should return nearest first.
-	public static NetherPortal findPortal(Block dest, int searchDistance) {
+	public static NetherPortal findPortal(Block dest, int searchDistance, String playerName) {
 		World world = dest.getWorld();
 		
 		int startX = dest.getX();		
@@ -107,9 +107,8 @@ public class NetherPortal {
 		// Since a portal is 2 blocks wide, we only need to
 		// check every other column.  We'll flip this flag
 		// after each check.
-		// TODO: can't skip checks on the outer edge of the 8x8 block
-		// boolean checkColumn = false;
-		boolean checkColumn = true;
+		// We can't skip checks on the outer edge of the 8x8 block
+		boolean checkColumn = false;
 		
 		// Start in the middle and loop outward.
 		//
@@ -128,7 +127,7 @@ public class NetherPortal {
 			c = new char[searchDistance][searchDistance];
 			c[x][y] = 'S';
 			
-			System.out.println("Starting portal search at (" + (x + startX) + ", " + (y + startY) + ").");
+			System.out.println("NETHER_PLUGIN: " + playerName + ": Starting portal search at (" + (x + startX) + ", " + (y + startY) + ").");
 		}
 
 		int sign = -1;
@@ -143,6 +142,11 @@ public class NetherPortal {
 					else
 						x += sign;
 
+					// If we're on the outer edge of the search space, we have to check every single column, 
+					// since the portal could be straddled across two search spaces.
+					if (0 == x || (searchDistance-1) == x || 0 == y || (searchDistance-1) == y)
+						checkColumn = true;
+					
 					if (checkColumn)
 						np = checkCol(world, x + startX, y + startY, startZ);
 					
@@ -150,7 +154,7 @@ public class NetherPortal {
 					if (null != np) {
 						if (DEBUG) {
 							c[x][y] = 'X';
-							logSearch(c, searchDistance);
+							logSearch(c, searchDistance, playerName);
 						}
 						return np;
 					}
@@ -176,8 +180,9 @@ public class NetherPortal {
 					// I flip my bits back and forth, I flip my bits back and forth, I flip
 					// my bits back and forth, I flip my bits back and forth, I flip my bits
 					// back and forth
-					// TODO: can't skip checks on the outer edge of the 8x8 block
-					// checkColumn = !checkColumn;
+					// When we're on the outer edge of the search space we'll manually set this
+					// value to true.
+					checkColumn = !checkColumn;
 		
 					// Because we start going down, left, up, right, we'll
 					// always end traveling along the y axis
@@ -185,7 +190,7 @@ public class NetherPortal {
 					// we'll only need to travel n-1 blocks
 					if (0 == xy && n == searchDistance && i + 1 == n) {
 						if (DEBUG)
-							logSearch(c, searchDistance);
+							logSearch(c, searchDistance, playerName);
 
 						// Didn't find a portal
 						return null;
@@ -197,7 +202,7 @@ public class NetherPortal {
 		}
 		
 		if (DEBUG)
-			logSearch(c, searchDistance);
+			logSearch(c, searchDistance, playerName);
 
 		// Didn't find a portal
 		return null;

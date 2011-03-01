@@ -15,10 +15,9 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class NetherMain extends JavaPlugin
 {
-	private final NetherPlayerListener playerListener = new NetherPlayerListener(this);
-
-	public void onEnable()
-	{
+	private final NetherPlayerListener playerListener = new NetherPlayerListener(this);	
+	
+	public void onEnable() {		
 		// Register events
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
@@ -29,7 +28,6 @@ public class NetherMain extends JavaPlugin
 		System.out.println(pdfFile.getName() + " v" + pdfFile.getVersion() + " enabled");
 	}
 
-	public void onDisable()
-	{
+	public void onDisable() {
 	}
 }
