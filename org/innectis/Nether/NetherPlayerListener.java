@@ -5,6 +5,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World.Environment;
@@ -58,6 +59,7 @@ public class NetherPlayerListener extends PlayerListener
 			
 			World nether = main.getServer().getWorld(netherName);
 			if (nether == null) {
+				event.getPlayer().sendMessage(ChatColor.RED + "First load of world " + netherName + ", please wait.");
 				nether = main.getServer().createWorld(netherName, Environment.NETHER);
 			}
 			
@@ -70,15 +72,22 @@ public class NetherPlayerListener extends PlayerListener
 			// Try to find a portal near where the player should land
 			Block dest = nether.getBlockAt(b.getX() / 8, b.getY(), b.getZ() / 8);
 			NetherPortal portal = NetherPortal.findPortal(dest);
+			Location spawn;
 			if (portal == null) {
 				portal = NetherPortal.createPortal(dest);
+				spawn = portal.getSpawn();
 				System.out.println(event.getPlayer().getName() + " portals to Nether [NEW]");
 			} else {
-				System.out.println(event.getPlayer().getName() + " portals to Nether");
+				spawn = portal.getVerifiedSpawn();
+				if(spawn == null){
+					System.out.println(event.getPlayer().getName() + " failed to portal to Nether");
+					spawn = NetherPortal.getVerifiedSpawn(b);
+					if(spawn == null) spawn = b.getWorld().getSpawnLocation(); // Should never reach here.
+				}
+				else System.out.println(event.getPlayer().getName() + " portals to Nether");
 			}
 			
 			// Go!
-			Location spawn = portal.getSpawn();
 			event.getPlayer().teleportTo(spawn);
 			event.setTo(spawn);
 		} else if (world.getEnvironment().equals(Environment.NETHER)) {
@@ -93,15 +102,22 @@ public class NetherPlayerListener extends PlayerListener
 			// Try to find a portal near where the player should land
 			Block dest = normal.getBlockAt(b.getX() * 8, b.getY(), b.getZ() * 8);
 			NetherPortal portal = NetherPortal.findPortal(dest);
+			Location spawn;
 			if (portal == null) {
 				portal = NetherPortal.createPortal(dest);
+				spawn = portal.getSpawn();
 				System.out.println(event.getPlayer().getName() + " portals to normal world [NEW]");
 			} else {
-				System.out.println(event.getPlayer().getName() + " portals to normal world");
+				spawn = portal.getVerifiedSpawn();
+				if(spawn == null){
+					System.out.println(event.getPlayer().getName() + " failed to portal to normal world");
+					spawn = NetherPortal.getVerifiedSpawn(b);
+					if(spawn == null) spawn = b.getWorld().getSpawnLocation(); // Should never reach here.
+				}
+				else System.out.println(event.getPlayer().getName() + " portals to normal world");
 			}
 			
 			// Go!
-			Location spawn = portal.getSpawn();
 			event.getPlayer().teleportTo(spawn);
 			event.setTo(spawn);
 		}
