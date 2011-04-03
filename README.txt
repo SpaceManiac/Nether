@@ -10,7 +10,8 @@ features.
     formed around them.
   - Dying in the Nether will respawn players in the normal world.
 
-Nether is currently on version 1.1.
+Nether is currently on version 1.2. You can configure the nether world name
+in plugins/Nether/config.yml.
 
 == LICENSE ==
 
