@@ -20,8 +20,8 @@ public class NetherMain extends JavaPlugin
 
 	public void onEnable()
 	{
-		Configuration	properties = this.getConfiguration();
-		String			tempString;
+		Configuration properties = this.getConfiguration();
+		String tempString;
 		
 		// Check the config.yml
 		tempString = properties.getString("nether-world-name");
