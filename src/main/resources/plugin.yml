@@ -1,0 +1,5 @@
+name: Nether
+version: 2.0
+author: SpaceManiac
+description: Provides simple improved Nether portals
+main: com.platymuus.bukkit.nether.NetherPlugin
