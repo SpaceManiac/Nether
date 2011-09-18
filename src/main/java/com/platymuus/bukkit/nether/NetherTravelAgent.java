@@ -2,19 +2,29 @@ package com.platymuus.bukkit.nether;
 
 import org.bukkit.Location;
 import org.bukkit.TravelAgent;
+import org.bukkit.World.Environment;
 
 /**
  * Travel agent for Agent mode
  */
 class NetherTravelAgent implements TravelAgent {
 
-    private int searchRadius = 5;
-
-    private int creationRadius = 5;
-
+    private final NetherPlugin plugin;
+    private final String player;
+    private final boolean destNether;
+    
+    private int searchRadius = 16;
+    private int creationRadius = 12;
     private boolean canCreate = true;
-
-    public NetherTravelAgent(NetherPlugin plugin) {
+    
+    public NetherTravelAgent(NetherPlugin plugin, String player, Environment sourceEnvironment) {
+        this.plugin = plugin;
+        this.player = player;
+        destNether = sourceEnvironment != Environment.NETHER;
+    }
+    
+    private String destText() {
+        return destNether ? "Nether" : "normal world";
     }
 
     public TravelAgent setSearchRadius(int radius) {
@@ -46,20 +56,33 @@ class NetherTravelAgent implements TravelAgent {
     public Location findOrCreate(Location location) {
         Location foundLoc = findPortal(location);
         if (foundLoc == null && createPortal(location)) {
-            return location;
+            foundLoc = findPortal(location);
+            if (foundLoc == null) {
+                // So apparently we created an unfindable portal.
+                plugin.logMessage(player + " failed to portal to " + destText());
+                return location;
+            } else {
+                plugin.logMessage(player + " portalled to " + destText() + " [NEW]");
+                return foundLoc;
+            }
+        } else {
+            plugin.logMessage(player + " portalled to " + destText());
+            return foundLoc;
         }
-        return foundLoc;
     }
 
     public Location findPortal(Location location) {
-        return null;
+        NetherPortal portal = NetherPortal.findPortal(location.getBlock(), searchRadius);
+        if (portal == null) return null;
+        return portal.getBlock().getLocation();
     }
 
     public boolean createPortal(Location location) {
         if (!canCreate) {
             return false;
         }
-
+        
+        NetherPortal.createPortal(location.getBlock());
         return true;
     }
 

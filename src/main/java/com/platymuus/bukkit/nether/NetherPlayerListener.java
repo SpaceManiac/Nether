@@ -110,12 +110,12 @@ class NetherPlayerListener extends PlayerListener {
     @Override
     public void onPlayerPortal(PlayerPortalEvent event) {
         // Note: only registered when mode is AGENT or ADJUST
-        event.setPortalTravelAgent(plugin.adjustTravelAgent(event.getPortalTravelAgent()));
+        event.setPortalTravelAgent(plugin.adjustTravelAgent(event.getPortalTravelAgent(), event.getPlayer()));
     }
 
     @Override
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        // Return nether-deaths to normal world
+        // Note: only registered when respawn is true
         if (event.getPlayer().getWorld().getEnvironment() == World.Environment.NETHER) {
             World normal = plugin.getNormal();
             if (normal != null) {

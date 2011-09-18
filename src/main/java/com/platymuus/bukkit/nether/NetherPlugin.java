@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import org.bukkit.TravelAgent;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -98,7 +99,7 @@ public class NetherPlugin extends JavaPlugin {
 
     public World getNormal() {
         for (World world : getServer().getWorlds()) {
-            if (world.getEnvironment() == Environment.NORMAL) {
+            if (world.getEnvironment() != Environment.NETHER) {
                 return world;
             }
         }
@@ -111,9 +112,12 @@ public class NetherPlugin extends JavaPlugin {
         }
     }
 
-    public TravelAgent adjustTravelAgent(TravelAgent agent) {
+    public TravelAgent adjustTravelAgent(TravelAgent agent, Player player) {
         if (getMode() == MODE_AGENT) {
-            agent = new NetherTravelAgent(this);
+            agent = new NetherTravelAgent(this, player.getName(), player.getWorld().getEnvironment());
+        } else {
+            boolean nether = player.getWorld().getEnvironment() == Environment.NETHER;
+            logMessage(player.getName() + " is portalling to " + (nether ? "normal world" : "Nether"));
         }
         agent.setSearchRadius(getSearchRadius()).setCreationRadius(getCreationRadius()).setCanCreatePortal(getCanCreate());
         return agent;
