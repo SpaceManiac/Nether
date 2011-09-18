@@ -3,6 +3,9 @@ package com.platymuus.bukkit.nether;
 import org.bukkit.Location;
 import org.bukkit.TravelAgent;
 
+/**
+ * Travel agent for Agent mode
+ */
 class NetherTravelAgent implements TravelAgent {
     
     private int searchRadius = 5;
