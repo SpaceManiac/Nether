@@ -1,0 +1,38 @@
+# Configuration for Nether 2.0
+
+# Mode can be one of three values:
+# 0 - Classic mode, just like Nether 1.2 (no delay when portalling)
+# 1 - Agent mode, which uses Nether 1.2's portal code but the new portalling
+#    events (delay when portalling)
+# 2 - Adjust mode, which uses the standard portal code but allows configuration
+# Classic mode requires allow-nether in server.properties to be false, and agent
+# and adjust mode require it to be true.
+mode: 1
+
+# Respawn affects how respawning works, and is independent of the mode.
+# false - respawning is not handled by this plugin - dying in the Nether will
+#    respawn you there.
+# true  - if a player dies in the Nether, they will respawn in the normal world.
+respawn: true
+
+# This is the name of the nether world. It only affects Classic mode.
+worldName: 'nether'
+
+# One block in the Nether equates to scale blocks in the normal world. Only
+# affects Classic mode.
+scale: 8
+
+# Whether to log portalling and respawning. Exact messages vary based on mode.
+log: false
+
+# Various options that apply to all modes are available.
+# searchRadius - the radius to search around the exact destination for an
+#    existing portal.
+# creationRadius - the radius around the exact destination that a portal may be
+#    created (does not affect Classic)
+# canCreate - whether new portals are allowed to be created.
+# If canCreate is off and no portal is found, some portals will not function.
+options:
+  searchRadius: 16
+  creationRadius: 12
+  canCreate: true

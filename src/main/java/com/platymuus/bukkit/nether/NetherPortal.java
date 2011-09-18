@@ -105,15 +105,15 @@ public class NetherPortal {
 	// ==============================
 	// Find a nearby portal within 16 blocks of the given block
 	// Not guaranteed to be the nearest
-	public static NetherPortal findPortal(Block dest) {
+	public static NetherPortal findPortal(Block dest, int radius) {
 		World world = dest.getWorld();
 		
 		// Get list of columns in a circle around the block
 		ArrayList<Block> columns = new ArrayList<Block>();
-		for (int x = dest.getX() - 16; x <= dest.getX() + 16; ++x) {
-			for (int z = dest.getZ() - 16; z <= dest.getZ() + 16; ++z) {
+		for (int x = dest.getX() - radius; x <= dest.getX() + radius; ++x) {
+			for (int z = dest.getZ() - radius; z <= dest.getZ() + radius; ++z) {
 				int dx = dest.getX() - x, dz = dest.getZ() - z;
-				if (dx * dx + dz * dz <= 256) {
+				if (dx * dx + dz * dz <= radius * radius) {
 					columns.add(world.getBlockAt(x, 0, z));
 				}
 			}
@@ -145,7 +145,6 @@ public class NetherPortal {
 		} else if (dest.getY() < 8) {
 			dest = world.getBlockAt(dest.getX(), 8, dest.getZ());
 		}
-		
 		
 		// Search for an area along the y axis that is suitable.
 		// Will check nearest blocks to dest first.

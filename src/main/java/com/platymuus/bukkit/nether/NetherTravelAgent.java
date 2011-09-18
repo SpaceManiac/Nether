@@ -7,9 +7,11 @@ import org.bukkit.TravelAgent;
  * Travel agent for Agent mode
  */
 class NetherTravelAgent implements TravelAgent {
-    
+
     private int searchRadius = 5;
+
     private int creationRadius = 5;
+
     private boolean canCreate = true;
 
     public NetherTravelAgent(NetherPlugin plugin) {
@@ -54,9 +56,11 @@ class NetherTravelAgent implements TravelAgent {
     }
 
     public boolean createPortal(Location location) {
-        if (!canCreate) return false;
-        
+        if (!canCreate) {
+            return false;
+        }
+
         return true;
     }
-    
+
 }
