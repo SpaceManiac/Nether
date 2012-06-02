@@ -23,7 +23,7 @@ public class NetherPlugin extends JavaPlugin {
 
     public static final int MODE_ADJUST = 2;
 
-    public static final String[] MODE_NAMES = { "Classic", "Agent", "Adjust" };
+    public static final String[] MODE_NAMES = {"Classic", "Agent", "Adjust"};
 
     public void onEnable() {
         // Write a default config if we need to

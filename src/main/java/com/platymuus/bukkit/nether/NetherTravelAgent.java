@@ -12,17 +12,17 @@ class NetherTravelAgent implements TravelAgent {
     private final NetherPlugin plugin;
     private final String player;
     private final boolean destNether;
-    
+
     private int searchRadius = 16;
     private int creationRadius = 12;
     private boolean canCreate = true;
-    
+
     public NetherTravelAgent(NetherPlugin plugin, String player, Environment sourceEnvironment) {
         this.plugin = plugin;
         this.player = player;
         destNether = sourceEnvironment != Environment.NETHER;
     }
-    
+
     private String destText() {
         return destNether ? "Nether" : "normal world";
     }
@@ -81,7 +81,7 @@ class NetherTravelAgent implements TravelAgent {
         if (!canCreate) {
             return false;
         }
-        
+
         NetherPortal.createPortal(location.getBlock());
         return true;
     }
