@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class NetherPortal {
 	
-	private Block block;
+	private final Block block;
 	
 	public NetherPortal(Block b) {
 		block = b;
@@ -25,14 +25,10 @@ public class NetherPortal {
 		return block;
 	}
 	
-	public void setBlock(Block b) {
-		block = b;
-	}
-	
 	// Return a random spawnable location
 	public Location getSpawn() {
-		if (block.getWorld().getBlockAt(block.getX() + 1, block.getY(), block.getZ()).getType().equals(Material.PORTAL) ||
-				block.getWorld().getBlockAt(block.getX() - 1, block.getY(), block.getZ()).getType().equals(Material.PORTAL)) {
+		if (block.getWorld().getBlockAt(block.getX() + 1, block.getY(), block.getZ()).getType() == Material.PORTAL ||
+				block.getWorld().getBlockAt(block.getX() - 1, block.getY(), block.getZ()).getType() == Material.PORTAL) {
 			// portal is in X direction
 			return new Location(block.getWorld(), block.getX() + 0.5,
 					block.getY(), block.getZ() + 1.5 - 2 * Math.round(Math.random()));
@@ -123,7 +119,7 @@ public class NetherPortal {
 		for (Block col : columns) {
 			for (int y = 127; y >= 0; --y) {
 				Block b = world.getBlockAt(col.getX(), y, col.getZ());
-				if (b.getType().equals(Material.PORTAL)) {
+				if (b.getType() == Material.PORTAL) {
 					// Huzzah!
 					return new NetherPortal(b);
 				}
@@ -273,11 +269,11 @@ public class NetherPortal {
 		// Leave out the types that have to be atop a solid block, though not plants,
 		// and others you don't want to destroy too: 55,63,64,65,66,68,69,70,71,72,75,76,77,93,94
 		final int[] notSupporting = {0,6,8,9,10,11,37,38,39,40,50,51,59,83,85,90};
-		
-		for (int x = 0; x < notSupporting.length; ++x) {
-			if (mat == notSupporting[x]) return false;
-		}
-		
+
+        for (int check : notSupporting) {
+            if (mat == check) return false;
+        }
+
 		return true;
 	}
 	
@@ -285,10 +281,10 @@ public class NetherPortal {
 	private static boolean canBreathe(int mat) {
 		// All the types that include a breathable air pocket, not including fire.
 		final int[] isBreathable = {0,6,37,38,39,40,50,55,59,63,64,65,66,68,69,70,71,72,75,76,77,83,93,94};
-		
-		for (int x = 0; x < isBreathable.length; ++x) {
-			if (mat == isBreathable[x]) return true;
-		}
+
+        for (int check : isBreathable) {
+            if (mat == check) return true;
+        }
 		
 		return false;
 	}
@@ -297,10 +293,10 @@ public class NetherPortal {
 	private static boolean canFall(int mat) {
 		// All the types that can fall on the player, causing much pain.
 		final int[] isUnstable = {8,9,10,11,12,13};
-		
-		for (int x = 0; x < isUnstable.length; ++x) {
-			if (mat == isUnstable[x]) return true;
-		}
+
+        for (int check : isUnstable) {
+            if (mat == check) return true;
+        }
 		
 		return false;
 	}

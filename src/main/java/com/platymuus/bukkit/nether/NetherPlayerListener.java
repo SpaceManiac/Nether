@@ -1,17 +1,20 @@
 package com.platymuus.bukkit.nether;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
-import org.bukkit.event.player.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
 /**
  * Player listener for Nether 2.0
  */
-class NetherPlayerListener extends PlayerListener {
+class NetherPlayerListener {
 
     private NetherPlugin plugin;
 
@@ -19,18 +22,18 @@ class NetherPlayerListener extends PlayerListener {
         this.plugin = plugin;
     }
 
-    @Override
+    @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         // Note: only registered when mode is CLASSIC
 
         Block b = event.getTo().getBlock();
         World world = b.getWorld();
-        if (!b.getType().equals(Material.PORTAL)) {
+        if (b.getType() != Material.PORTAL) {
             // Not a portal.
             return;
         }
 
-        if (world.getEnvironment().equals(Environment.NORMAL)) {
+        if (world.getEnvironment() == Environment.NORMAL) {
             // At this point the Nether has already been created.
             World nether = plugin.getNether();
 
@@ -67,7 +70,7 @@ class NetherPlayerListener extends PlayerListener {
             // Go!
             event.getPlayer().teleport(spawn);
             event.setTo(spawn);
-        } else if (world.getEnvironment().equals(Environment.NETHER)) {
+        } else if (world.getEnvironment() == Environment.NETHER) {
             // For now just head to the first world there.
             World normal = plugin.getNormal();
 
@@ -107,22 +110,32 @@ class NetherPlayerListener extends PlayerListener {
         }
     }
 
-    @Override
-    public void onPlayerPortal(PlayerPortalEvent event) {
-        // Note: only registered when mode is AGENT or ADJUST
-        event.setPortalTravelAgent(plugin.adjustTravelAgent(event.getPortalTravelAgent(), event.getPlayer()));
+    public class ClassicListener implements Listener {
+        @EventHandler
+        public void handle(PlayerMoveEvent event) {
+            onPlayerMove(event);
+        }
     }
 
-    @Override
-    public void onPlayerRespawn(PlayerRespawnEvent event) {
-        // Note: only registered when respawn is true
-        if (event.getPlayer().getWorld().getEnvironment() == World.Environment.NETHER) {
-            World normal = plugin.getNormal();
-            if (normal != null) {
-                plugin.logMessage(event.getPlayer().getName() + " respawned out of the Nether");
-                event.setRespawnLocation(normal.getSpawnLocation());
-            } else {
-                plugin.logMessage(event.getPlayer().getName() + " had no non-Nether to respawn to");
+    public class AdjustListener implements Listener {
+        @EventHandler
+        public void handle(PlayerPortalEvent event) {
+            event.setPortalTravelAgent(plugin.adjustTravelAgent(event.getPortalTravelAgent(), event.getPlayer()));
+        }
+    }
+
+    public class RespawnListener implements Listener {
+        @EventHandler
+        public void handle(PlayerRespawnEvent event) {
+            // Note: only registered when respawn is true
+            if (event.getPlayer().getWorld().getEnvironment() == World.Environment.NETHER) {
+                World normal = plugin.getNormal();
+                if (normal != null) {
+                    plugin.logMessage(event.getPlayer().getName() + " respawned out of the Nether");
+                    event.setRespawnLocation(normal.getSpawnLocation());
+                } else {
+                    plugin.logMessage(event.getPlayer().getName() + " had no non-Nether to respawn to");
+                }
             }
         }
     }

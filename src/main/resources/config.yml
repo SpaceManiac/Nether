@@ -23,7 +23,7 @@ worldName: 'nether'
 scale: 8
 
 # Whether to log portalling and respawning. Exact messages vary based on mode.
-log: false
+log: true
 
 # Various options that apply to all modes are available.
 # searchRadius - the radius to search around the exact destination for an
