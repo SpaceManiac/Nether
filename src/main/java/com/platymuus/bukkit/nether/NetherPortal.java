@@ -136,8 +136,8 @@ public class NetherPortal {
         World world = dest.getWorld();
 
         // Not too high or too low overall
-        if (dest.getY() > 120) {
-            dest = world.getBlockAt(dest.getX(), 120, dest.getZ());
+        if (dest.getY() > world.getMaxHeight() - 8) {
+            dest = world.getBlockAt(dest.getX(), world.getMaxHeight() - 8, dest.getZ());
         } else if (dest.getY() < 8) {
             dest = world.getBlockAt(dest.getX(), 8, dest.getZ());
         }
@@ -148,7 +148,7 @@ public class NetherPortal {
         Block checkBlock, chosenBlock = dest;
         int quality, chosenQuality = 0;
 
-        for (int y1 = dest.getY(), y2 = dest.getY(); (y1 > 4) || (y2 <= 124); --y1, ++y2) {
+        for (int y1 = dest.getY(), y2 = dest.getY(); (y1 > 4) || (y2 <= world.getMaxHeight() - 4); --y1, ++y2) {
             // Look below.
             if (y1 > 4) {
                 checkBlock = world.getBlockAt(dest.getX(), y1, dest.getZ());
@@ -163,7 +163,7 @@ public class NetherPortal {
             }
 
             // Look above.
-            if (y2 <= 124 && y2 != y1) {
+            if (y2 <= world.getMaxHeight() - 4 && y2 != y1) {
                 checkBlock = world.getBlockAt(dest.getX(), y2, dest.getZ());
                 quality = checkPortalQuality(checkBlock);
 

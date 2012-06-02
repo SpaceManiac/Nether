@@ -80,7 +80,7 @@ class NetherPlayerListener {
             }
 
             // Try to find a portal near where the player should land
-            Block dest = normal.getBlockAt(b.getX() * 8, b.getY(), b.getZ() * 8);
+            Block dest = normal.getBlockAt(b.getX() * plugin.getScale(), b.getY(), b.getZ() * plugin.getScale());
             NetherPortal portal = NetherPortal.findPortal(dest, plugin.getSearchRadius());
             Location spawn;
             if (portal == null) {
