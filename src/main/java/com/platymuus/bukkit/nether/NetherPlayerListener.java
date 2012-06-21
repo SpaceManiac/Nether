@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 /**
  * Player listener for Nether 2.0
@@ -55,10 +56,10 @@ class NetherPlayerListener {
                     return;
                 }
             } else {
-                spawn = portal.getVerifiedSpawn();
+                spawn = portal.getSpawn();
                 if (spawn == null) {
                     plugin.logMessage(event.getPlayer().getName() + " failed to portal to Nether");
-                    spawn = NetherPortal.getVerifiedSpawn(b);
+                    spawn = NetherPortal.getSafeSpawn(b);
                     if (spawn == null) {
                         spawn = b.getWorld().getSpawnLocation(); // Should never reach here.
                     }
@@ -92,10 +93,10 @@ class NetherPlayerListener {
                     return;
                 }
             } else {
-                spawn = portal.getVerifiedSpawn();
+                spawn = portal.getSpawn();
                 if (spawn == null) {
                     plugin.logMessage(event.getPlayer().getName() + " failed to portal to normal world");
-                    spawn = NetherPortal.getVerifiedSpawn(b);
+                    spawn = NetherPortal.getSafeSpawn(b);
                     if (spawn == null) {
                         spawn = b.getWorld().getSpawnLocation(); // Should never reach here.
                     }
@@ -120,7 +121,10 @@ class NetherPlayerListener {
     public class AdjustListener implements Listener {
         @EventHandler
         public void handle(PlayerPortalEvent event) {
-            event.setPortalTravelAgent(plugin.adjustTravelAgent(event.getPortalTravelAgent(), event.getPlayer()));
+            if (event.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {
+                // Don't adjust end portals or anything else
+                event.setPortalTravelAgent(plugin.adjustTravelAgent(event.getPortalTravelAgent(), event.getPlayer()));
+            }
         }
     }
 

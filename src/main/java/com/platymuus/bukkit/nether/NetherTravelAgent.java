@@ -74,7 +74,7 @@ class NetherTravelAgent implements TravelAgent {
     public Location findPortal(Location location) {
         NetherPortal portal = NetherPortal.findPortal(location.getBlock(), searchRadius);
         if (portal == null) return null;
-        return portal.getVerifiedSpawn();
+        return portal.getSpawn();
     }
 
     public boolean createPortal(Location location) {

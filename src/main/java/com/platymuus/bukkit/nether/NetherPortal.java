@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Mostly unchanged legacy code from Nether 1.2
+ * Workhorse class for Nether
  */
 public class NetherPortal {
 
@@ -21,34 +21,20 @@ public class NetherPortal {
         block = b;
     }
 
-    public Block getBlock() {
-        return block;
-    }
-
-    // Return a random spawnable location
-    public Location getSpawn() {
-        if (block.getWorld().getBlockAt(block.getX() + 1, block.getY(), block.getZ()).getType() == Material.PORTAL ||
-                block.getWorld().getBlockAt(block.getX() - 1, block.getY(), block.getZ()).getType() == Material.PORTAL) {
-            // portal is in X direction
-            return new Location(block.getWorld(), block.getX() + 0.5,
-                    block.getY(), block.getZ() + 1.5 - 2 * Math.round(Math.random()));
-        } else {
-            // portal is in Z direction
-            return new Location(block.getWorld(), block.getX() + 1.5 - 2 * Math.round(Math.random()),
-                    block.getY(), block.getZ() + 0.5);
-        }
-    }
-
-
     // If this is not a new Nether portal, it is best to check for room to spawn.
-    public Location getVerifiedSpawn() {
-        return getVerifiedSpawn(block);
+    public Location getSpawn() {
+        return getSafeSpawn(block);
     }
-
 
     // Check at an arbitrary location, used for failed teleport, to move back out of the portal frame.
-    public static Location getVerifiedSpawn(Block checkBlock) {
-        List<Block> list = listSpawns(checkBlock, true, 0);
+    public static Location getSafeSpawn(Block checkBlock) {
+        // First off, make sure we're dealing with one of the top portal blocks
+        while (checkBlock.getRelative(0, 1, 0).getType() == Material.PORTAL) {
+            checkBlock = checkBlock.getRelative(0, 1, 0);
+        }
+
+        // Get the list of possible spawn locations
+        List<Block> list = listSpawns(checkBlock, true);
 
         if (list != null && !list.isEmpty()) {
             // Use a random verified location to spawn.
@@ -62,34 +48,36 @@ public class NetherPortal {
         return null;
     }
 
-
     // Lists the valid spawns near a portal, you should pass this method one of the two top portal blocks.
     // Checks 4 spawns per portal block, for a total of 24.
-    private static List<Block> listSpawns(Block theBlock, boolean iteratePortal, int direction) {
+    private static List<Block> listSpawns(Block theBlock, boolean iteratePortal) {
         Block checkBlock;
         final BlockFace[] faces = {BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
         List<Block> list = new ArrayList<Block>();
 
         // Scan for an air pocket beside portal blocks.
-        for (int x = 0; x < faces.length; ++x) {
-            checkBlock = theBlock.getRelative(faces[x]);
+        for (BlockFace face : faces) {
+            checkBlock = theBlock.getRelative(face);
 
             if (checkBlock.getType() == Material.PORTAL) {
                 if (iteratePortal) {
-                    // If it is another portal block, check beside it too.  And below: (faces[x] == BlockFace.DOWN)
-                    if (x == 0) list.addAll(listSpawns(checkBlock, true, x));
-                    else list.addAll(listSpawns(checkBlock, false, x));
+                    list.addAll(listSpawns(checkBlock, face == BlockFace.DOWN));
                 }
             } else if (checkBlock.getType() != Material.OBSIDIAN) {
                 // Check for air directly beside portal.
                 if (canBreathe(checkBlock.getTypeId()) && canBreathe(checkBlock.getRelative(BlockFace.DOWN).getTypeId())) {
-                    list.add(checkBlock);
-                }
+                    // If it's standable-on, it works
+                    if (canStand(checkBlock.getRelative(BlockFace.DOWN, 2).getTypeId())) {
+                        list.add(checkBlock);
+                    }
 
-                // Also check the next block out too.
-                checkBlock = checkBlock.getRelative(faces[x]);
-                if (canBreathe(checkBlock.getTypeId()) && canBreathe(checkBlock.getRelative(BlockFace.DOWN).getTypeId())) {
-                    list.add(checkBlock);
+                    // Also check the next block out too.
+                    checkBlock = checkBlock.getRelative(face);
+                    if (canBreathe(checkBlock.getTypeId()) && canBreathe(checkBlock.getRelative(BlockFace.DOWN).getTypeId())) {
+                        if (canStand(checkBlock.getRelative(BlockFace.DOWN, 2).getTypeId())) {
+                            list.add(checkBlock);
+                        }
+                    }
                 }
             }
         }
@@ -97,8 +85,6 @@ public class NetherPortal {
         return list;
     }
 
-
-    // ==============================
     // Find a nearby portal within 16 blocks of the given block
     // Not guaranteed to be the nearest
     public static NetherPortal findPortal(Block dest, int radius) {
@@ -117,7 +103,7 @@ public class NetherPortal {
 
         // For each column try to find a portal block
         for (Block col : columns) {
-            for (int y = 127; y >= 0; --y) {
+            for (int y = world.getMaxHeight() - 1; y >= 0; --y) {
                 Block b = world.getBlockAt(col.getX(), y, col.getZ());
                 if (b.getType() == Material.PORTAL) {
                     // Huzzah!
@@ -135,9 +121,14 @@ public class NetherPortal {
     public static NetherPortal createPortal(Block dest) {
         World world = dest.getWorld();
 
+        int maxHeight = world.getMaxHeight();
+        if (world.getEnvironment() == Environment.NETHER) {
+            maxHeight = 128;
+        }
+
         // Not too high or too low overall
-        if (dest.getY() > world.getMaxHeight() - 8) {
-            dest = world.getBlockAt(dest.getX(), world.getMaxHeight() - 8, dest.getZ());
+        if (dest.getY() > maxHeight - 8) {
+            dest = world.getBlockAt(dest.getX(), maxHeight - 8, dest.getZ());
         } else if (dest.getY() < 8) {
             dest = world.getBlockAt(dest.getX(), 8, dest.getZ());
         }
@@ -148,7 +139,7 @@ public class NetherPortal {
         Block checkBlock, chosenBlock = dest;
         int quality, chosenQuality = 0;
 
-        for (int y1 = dest.getY(), y2 = dest.getY(); (y1 > 4) || (y2 <= world.getMaxHeight() - 4); --y1, ++y2) {
+        for (int y1 = dest.getY(), y2 = dest.getY(); (y1 > 4) || (y2 <= maxHeight - 4); --y1, ++y2) {
             // Look below.
             if (y1 > 4) {
                 checkBlock = world.getBlockAt(dest.getX(), y1, dest.getZ());
@@ -163,7 +154,7 @@ public class NetherPortal {
             }
 
             // Look above.
-            if (y2 <= world.getMaxHeight() - 4 && y2 != y1) {
+            if (y2 <= maxHeight - 4 && y2 != y1) {
                 checkBlock = world.getBlockAt(dest.getX(), y2, dest.getZ());
                 quality = checkPortalQuality(checkBlock);
 
@@ -237,7 +228,6 @@ public class NetherPortal {
         return new NetherPortal(dest);
     }
 
-
     // This depends on portals being made +1 in the X direction, as they currently are.
     // Blocks are cached in CraftBukkit for speed.  Returns a value 0-28.
     private static int checkPortalQuality(Block checkBlock) {
@@ -264,7 +254,6 @@ public class NetherPortal {
         return quality;
     }
 
-
     private static boolean canStand(int mat) {
         // Leave out the types that have to be atop a solid block, though not plants,
         // and others you don't want to destroy too: 55,63,64,65,66,68,69,70,71,72,75,76,77,93,94
@@ -277,7 +266,6 @@ public class NetherPortal {
         return true;
     }
 
-
     private static boolean canBreathe(int mat) {
         // All the types that include a breathable air pocket, not including fire.
         final int[] isBreathable = {0, 6, 37, 38, 39, 40, 50, 55, 59, 63, 64, 65, 66, 68, 69, 70, 71, 72, 75, 76, 77, 83, 93, 94};
@@ -288,7 +276,6 @@ public class NetherPortal {
 
         return false;
     }
-
 
     private static boolean canFall(int mat) {
         // All the types that can fall on the player, causing much pain.
